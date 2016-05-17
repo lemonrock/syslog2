@@ -9,6 +9,8 @@
 
 A future direction is to add support for logging to Windows Event Log.
 
+This crate supports logging to [loggly](https://www.loggly.com/docs/streaming-syslog-without-using-files/) using custom structured data.
+
 
 ## Licensing
 

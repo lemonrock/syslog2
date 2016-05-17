@@ -16,6 +16,8 @@ pub struct TruncatedUsAsciiPrintableString
 	value: Vec<u8>
 }
 
+const LogglyIanaPrivateEnterpriseNumber: u32 = 41058;
+
 impl TruncatedUsAsciiPrintableString
 {
 	pub fn new(string: &str, maximum_length: usize) -> TruncatedUsAsciiPrintableString
@@ -28,16 +30,26 @@ impl TruncatedUsAsciiPrintableString
 	
 	pub fn new_sd_name(sd_name: &str) -> TruncatedUsAsciiPrintableString
 	{
-		for character in sd_name.chars()
-		{
-			match character
-			{
-				'"' | '\\' | ']' | '\x00' ... '\x20' | '\x7F' => panic!("A SDNAME can not contain control codes, spaces, DEL, double quotes, slashes or closing square brackets"),
-				'\x21' ... '\x7E' => {},
-				_ => panic!("A SDNAME can not contain Unicode characters that can not be converted to printable US-ASCII"),
-			}
-		}
+		validate_sd_name(sd_name);
 		TruncatedUsAsciiPrintableString::new(sd_name, 32)
+	}
+	
+	pub fn new_registered_structured_data_element_id(sd_name_for_structured_element_id: &str) -> TruncatedUsAsciiPrintableString
+	{
+		validate_sd_name_for_structured_element_id(sd_name_for_structured_element_id);
+		TruncatedUsAsciiPrintableString::new(sd_name_for_structured_element_id, 32)
+	}
+	
+	pub fn new_private_structured_data_element_id(sd_name_for_structured_element_id: &str, iana_private_enterprise_number: u32) -> TruncatedUsAsciiPrintableString
+	{
+		validate_sd_name_for_structured_element_id(sd_name_for_structured_element_id);
+		TruncatedUsAsciiPrintableString::new(&format!("{}@{}", sd_name_for_structured_element_id, iana_private_enterprise_number), 32)
+	}
+	
+	/// This is formatted as an UUID, eg  01234567-89ab-cdef-0123-456789abcdef
+	pub fn new_private_structured_data_element_id_for_loggly(loggly_customer_token: &str) -> TruncatedUsAsciiPrintableString
+	{
+		TruncatedUsAsciiPrintableString::new_private_structured_data_element_id(loggly_customer_token, LogglyIanaPrivateEnterpriseNumber)
 	}
 
 	fn truncate_us_ascii_printable(string: &str, maximum_length: usize) -> String
@@ -49,6 +61,35 @@ impl TruncatedUsAsciiPrintableString
 	{
 		StructuredDataParameter::new(self, value)
 	}
+}
+
+fn validate_sd_name(sd_name: &str) -> bool
+{
+	for character in sd_name.chars()
+	{
+		match character
+		{
+			'"' | '\\' | ']' | '\x00' ... '\x20' | '\x7F' => panic!("A SDNAME can not contain control codes, spaces, DEL, double quotes, slashes or closing square brackets"),
+			'\x21' ... '\x7E' => {},
+			_ => panic!("A SDNAME can not contain Unicode characters that can not be converted to printable US-ASCII"),
+		}
+	}
+	true
+}
+
+fn validate_sd_name_for_structured_element_id(sd_name_for_structured_element_id: &str) -> bool
+{
+	validate_sd_name(sd_name_for_structured_element_id);
+	
+	for character in sd_name_for_structured_element_id.chars()
+	{
+		match character
+		{
+			'@' => panic!("A SDNAME for a structured element id can contain an '@' character"),
+			_ => {},
+		}
+	}
+	true
 }
 
 pub trait WriteTruncatedUsAsciiPrintableString

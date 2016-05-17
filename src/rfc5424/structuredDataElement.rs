@@ -20,19 +20,23 @@ static mut SequenceId: AtomicI32 = AtomicI32::new(1);
 
 lazy_static!
 {
-	pub static ref timeQualitySdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("timeQuality");
+	pub static ref timeQualitySdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_registered_structured_data_element_id("timeQuality");
 	pub static ref tzKnownSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("tzKnown");
 	pub static ref isSyncedSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("isSynced");
 	pub static ref syncAccuracySdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("syncAccuracy");
-	pub static ref originSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("origin");
+	
+	pub static ref originSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_registered_structured_data_element_id("origin");
 	pub static ref enterpriseIdSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("enterpriseId");
 	pub static ref softwareSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("software");
 	pub static ref softwareVersionSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("softwareVersion");
 	pub static ref ipSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("ip");
-	pub static ref metaSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("meta");
+	
+	pub static ref metaSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_registered_structured_data_element_id("meta");
 	pub static ref sequenceIdSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("sequenceId");
 	pub static ref sysUpTime: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("sysUpTime");
 	pub static ref languageSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("language");
+	
+	pub static ref tagSdName: TruncatedUsAsciiPrintableString = TruncatedUsAsciiPrintableString::new_sd_name("tag");
 }
 
 pub struct StructuredDataElement<'a>
@@ -44,6 +48,21 @@ pub struct StructuredDataElement<'a>
 impl <'a> StructuredDataElement<'a>
 {
 	// More at https://www.iana.org/assignments/syslog2-parameters/syslog2-parameters.xhtml
+	
+	pub fn new(id: &'a TruncatedUsAsciiPrintableString, anticipated_number_of_parameters: usize) -> StructuredDataElement<'a>
+	{
+		StructuredDataElement
+		{
+			id: id,
+			parameters: Vec::with_capacity(anticipated_number_of_parameters),
+		}
+	}
+	
+	pub fn append_loggly_tag(&mut self, tag: &'a str)
+	{
+		debug_assert!(validate_loggly_tag(tag), "Invalid tag '{tag}'");
+		self.parameters.push(tagSdName.parameter(tag.into()))
+	}
 	
 	pub fn write(&self, mut writer: &mut Vec<u8>)
 	{	
@@ -149,6 +168,31 @@ impl <'a> StructuredDataElement<'a>
 			parameters: parameters,
 		}
 	}
+}
+
+fn validate_loggly_tag<'a>(tag: &'a str) -> bool
+{
+	// loggly documentation does not clearly distinguish UTF-8 from Unicode; we'll assume they mean UTF-8 bytes, which is tighter
+	debug_assert!(tag.len() <= 64, "tag '{}' is too long (longer than 64 characters)", tag);
+
+	for (index, character) in tag.char_indices()
+	{
+		match character
+		{
+			'A' ... 'X' | 'a' ... 'x' | '0' ... '9' =>
+			{
+			},
+			'_' | '-' | '.' =>
+			{
+				if index == 0
+				{
+					panic!("A tag can only start with alphanumeric characters, not '{}'", character);
+				}
+			}
+			_ => panic!("A tag can only contain alphanumeric characters, underscore, dash and period, not '{}'", character),
+		}
+	}
+	true
 }
 
 impl <'a> PartialEq for StructuredDataElement<'a>

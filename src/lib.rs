@@ -41,33 +41,6 @@ pub mod syslogSenders;
 
 pub mod rfc5424;
 
-// TODO: What are the Windows event log equivalents?
-// TODO: Integrate with the log crate...
-// TODO: Hand-off thread for SyslogSender, because they block
-// TODO: TCP reconnect on failure. Not great, as possible we will have sent a partial message...
-	// TODO: Progressive retries
-	// TODO: TLS using either openssl or libtls (preferred)
-// TODO: Unix domain socket integration (eg for rsyslog)
-// TODO: TCP socket close down on end-of-logging
-// TODO: syslog logging macros - like logging or format!() macros, but create a String with a final "\0" on it
-	// TODO: format macros for CString (HARD, as compiler built in - examine compiler generated code)
-	// TODO: audit formats (use ':' or some other separator (\t would be nice but rsyslog subs by default))
-
-
-// Extensions: rust collectd, statsd, collectd plugins
-	// Hosted graphite using statsd (securely): https://www.hostedgraphite.com/hosted-statsd
-	// Sending data to collectd via insecure UDP: https://pythonhosted.org/collectd/
-// hwloc
-
-
-// Loggly uses a variant of this over TCP or UDP (I think needs syslog tokens)
-// Loggly uses a variant of this that works using TLS over TCP
-// Papertrail uses RFC 3164 or RFC 5424 over TCP or UDP or TLS over TCP
-// Loggr == agents
-// Logentries (needs syslog tokens, but has support for searches for metrics, threshold alerts and can output to a hosted graphite)
-// https://sematext.com/logsene/ (hosted kibana)
-// Cloudlytics
-
 pub fn syslog_cstr_currentLoggingFacility(severity: Severity, message: &CStr)
 {
 	let priority = severity.toPriorityForCurrentLoggingFacility();
