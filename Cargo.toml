@@ -2,9 +2,9 @@
 # Copyright © 2016 The developers of syslog. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/syslog/master/COPYRIGHT.
 
 [package]
-name = "syslog"
-description = "definitions for syslog"
-keywords = ["reflection"]
+name = "syslog2"
+description = "An accurate, libc, RFC 3164 and RFC 5424 syslog implementation that correctly models Structured Data and provides polyfills for Solaris and Windows"
+keywords = ["syslog", "RFC5424", "RFC3164", "appender", "log", "logging"]
 license = "MIT"
 authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
 documentation = "https://github.com/lemonrock/syslog/blob/master/README.md"
@@ -18,7 +18,7 @@ publish = false
 version = "0.0.0"
 
 [replace]
-"libc:0.2.11" = { git = "https://github.com/lemonrock/libc", branch = "temp" }
+"libc:0.2.11" = { git = "https://github.com/lemonrock/libc" }
 
 [dependencies]
 libc = "0.2.11"
@@ -27,7 +27,7 @@ time = "0.1"
 cfg-if = "^0.1"
 once = { version = "0.2.1", git = "https://github.com/phil-opp/rust-once", rev = "45d4ae2982e4292d07ad41803fa9e6576f7534f4" }
 try-finally = { version = "0.0.0", git = "https://github.com/lemonrock/try-finally" }
-network-constants = { path = "components/network-constants" }
-process = { path = "components/process" }
-string-utilities = { path = "components/string-utilities" }
+network-constants = { version = "0.0.0", git = "https://github.com/lemonrock/network-constants" }
+process = { version = "0.0.0", git = "https://github.com/lemonrock/process" }
+string-utilities = { version = "0.0.0", git = "https://github.com/lemonrock/string-utilities" }
 uptime = { git = "https://github.com/lemonrock/uptime" }

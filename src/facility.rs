@@ -4,7 +4,7 @@
 extern crate libc;
 use Priority;
 use Severity;
-use super::syslog2Senders::Rfc3164Facility;
+use super::syslogSenders::Rfc3164Facility;
 use self::libc::c_int;
 
 /// Fill in for lack of this value in Android bionic's libc

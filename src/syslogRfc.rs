@@ -6,7 +6,7 @@ use std::io::Write;
 use self::time::Tm;
 use rfc5424::TruncatedUsAsciiPrintableString;
 use rfc5424::StructuredData;
-use syslog2Senders::Rfc3164Facility;
+use syslogSenders::Rfc3164Facility;
 use rfc5424::write_structured_data_elements;
 use Severity;
 use rfc5424::truncatedUsAsciiPrintableString::WriteTruncatedUsAsciiPrintableString;

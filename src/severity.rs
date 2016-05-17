@@ -6,7 +6,7 @@ extern crate libc;
 use Facility;
 use Priority;
 use LogMask;
-use super::syslog2Senders::Rfc3164Facility;
+use super::syslogSenders::Rfc3164Facility;
 use self::libc::c_int;
 
 #[allow(non_camel_case_types)]

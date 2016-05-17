@@ -8,8 +8,8 @@ extern crate libc;
 pub use self::rfc3164Facility::Rfc3164Facility;
 mod rfc3164Facility;
 
-pub use self::syslog2Sender::SyslogSender;
-mod syslog2Sender;
+pub use self::syslogSender::SyslogSender;
+mod syslogSender;
 
 pub use self::insecureBlockingUdpSyslogSender::InsecureBlockingUdpSyslogSender;
 mod insecureBlockingUdpSyslogSender;

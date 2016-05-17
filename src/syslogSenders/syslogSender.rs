@@ -2,7 +2,7 @@
 // Copyright © 2016 The developers of syslog2. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/syslog2/master/COPYRIGHT.
 
 
-use syslog2Senders::Rfc3164Facility;
+use syslogSenders::Rfc3164Facility;
 use Severity;
 use std::io::Result;
 use rfc5424::StructuredData;

@@ -21,18 +21,18 @@ static SyslogTemplate: &'static [u8] = b"%s\0";
 
 static UnformattableFatalPanic: &'static [u8] = b"Fatal panic (data unformattable)\0";
 
-pub fn syslog2_cstr(priority: Priority, message: &CStr)
+pub fn syslog_cstr(priority: Priority, message: &CStr)
 {
-	unsafe { self::libc::syslog2(priority as c_int, SyslogTemplate.as_ptr() as *const c_char, message); }
+	unsafe { self::libc::syslog(priority as c_int, SyslogTemplate.as_ptr() as *const c_char, message); }
 	
 	#[cfg(target_os = "solaris")]
 	log_to_standard_error_for_windows_and_solaris_cstr(priority, message);
 }
 
 // Exists because we need byte string constants, and these are for UNSIGNED bytes
-pub fn syslog2_bytes(priority: Priority, message: &[u8])
+pub fn syslog_bytes(priority: Priority, message: &[u8])
 {
-	unsafe { self::libc::syslog2(priority as c_int, SyslogTemplate.as_ptr() as *const c_char, message); }
+	unsafe { self::libc::syslog(priority as c_int, SyslogTemplate.as_ptr() as *const c_char, message); }
 	
 	#[cfg(target_os = "solaris")]
 	log_to_standard_error_for_windows_and_solaris_bytes(priority, message);
@@ -70,8 +70,8 @@ where F: Fn() -> R
 			
 			match CString::new(messageResult)
 			{
-				Err(_) => syslog2_bytes(criticalPriority, &UnformattableFatalPanic),
-				Ok(ref message) => syslog2_cstr(criticalPriority, message)
+				Err(_) => syslog_bytes(criticalPriority, &UnformattableFatalPanic),
+				Ok(ref message) => syslog_cstr(criticalPriority, message)
 			};
 		}
 		

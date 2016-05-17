@@ -5,12 +5,12 @@
 extern crate process;
 extern crate time;
 extern crate string_utilities;
-use std::io::Result;
-use syslog2Senders::Rfc3164Facility;
-use syslog2Senders::SyslogSender;
-use Severity;
-use syslog2_cstr_withFacility;
 use self::string_utilities::to_cstr_best_effort;
+use std::io::Result;
+use syslogSenders::Rfc3164Facility;
+use syslogSenders::SyslogSender;
+use Severity;
+use syslog_cstr_withFacility;
 use rfc5424::StructuredData;
 
 #[allow(dead_code)]
@@ -37,7 +37,7 @@ impl SyslogSender for PosixSyslogSender
 	{
 		let (cStringMessage, errorOption) = to_cstr_best_effort(message);
 		
-		syslog2_cstr_withFacility(severity, &cStringMessage, rfc3164Facility.toFacilityMappingSolarisToDaemon());
+		syslog_cstr_withFacility(severity, &cStringMessage, rfc3164Facility.toFacilityMappingSolarisToDaemon());
 		
 		match errorOption
 		{

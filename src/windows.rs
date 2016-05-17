@@ -11,13 +11,13 @@ use std::ffi::CStr;
 use std::ffi::CString;
 use Priority;
 
-pub fn syslog2_cstr(priority: Priority, message: &CStr)
+pub fn syslog_cstr(priority: Priority, message: &CStr)
 {
 	log_to_standard_error_for_windows_and_solaris_cstr(priority, message);
 }
 
 // Exists because we need byte string constants, and these are for UNSIGNED bytes
-pub fn syslog2_bytes(priority: Priority, message: &[u8])
+pub fn syslog_bytes(priority: Priority, message: &[u8])
 {
 	log_to_standard_error_for_windows_and_solaris_bytes(priority, message);
 }
