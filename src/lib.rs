@@ -45,16 +45,20 @@ pub mod rfc5424;
 // TODO: Integrate with the log crate...
 // TODO: Hand-off thread for SyslogSender, because they block
 // TODO: TCP reconnect on failure. Not great, as possible we will have sent a partial message...
+	// TODO: Progressive retries
+	// TODO: TLS using either openssl or libtls (preferred)
+// TODO: Unix domain socket integration (eg for rsyslog)
 // TODO: TCP socket close down on end-of-logging
 // TODO: syslog logging macros - like logging or format!() macros, but create a String with a final "\0" on it
 	// TODO: format macros for CString (HARD, as compiler built in - examine compiler generated code)
 	// TODO: audit formats (use ':' or some other separator (\t would be nice but rsyslog subs by default))
-// TODO: syslog RFC 5424 uptime - a bit challenging
-// TODO: libtls + TCP syslog
+
 
 // Extensions: rust collectd, statsd, collectd plugins
 	// Hosted graphite using statsd (securely): https://www.hostedgraphite.com/hosted-statsd
 	// Sending data to collectd via insecure UDP: https://pythonhosted.org/collectd/
+// hwloc
+
 
 // Loggly uses a variant of this over TCP or UDP (I think needs syslog tokens)
 // Loggly uses a variant of this that works using TLS over TCP

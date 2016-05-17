@@ -33,7 +33,7 @@ impl PosixSyslogSender
 
 impl SyslogSender for PosixSyslogSender
 {
-	fn send(&self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>
+	fn send(&mut self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>
 	{
 		let (cStringMessage, errorOption) = to_cstr_best_effort(message);
 		

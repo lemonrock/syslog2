@@ -35,9 +35,7 @@ impl InsecureThreadUnsafeBlockingTcpSyslogSender
 {
 	fn new<S: ToSocketAddrs>(syslog2Rfc: SyslogRfc, serverSocketAddress: S) -> Result<InsecureThreadUnsafeBlockingTcpSyslogSender>
 	{
-		let stream = try!(TcpStream::connect(serverSocketAddress));
-		try!(stream.set_write_timeout(None));
-		try!(stream.shutdown(Shutdown::Read));
+		let stream = try!(InsecureThreadUnsafeBlockingTcpSyslogSender::newTcpStream(serverSocketAddress));
 		
 		Ok(InsecureThreadUnsafeBlockingTcpSyslogSender
 		{
@@ -65,11 +63,19 @@ impl InsecureThreadUnsafeBlockingTcpSyslogSender
 	{
 		InsecureThreadUnsafeBlockingTcpSyslogSender::new(syslog2Rfc, (serverAddress, SyslogPort))
 	}
+
+	fn newTcpStream<S: ToSocketAddrs>(serverSocketAddress: S) -> Result<TcpStream>
+	{
+		let stream = try!(TcpStream::connect(serverSocketAddress));
+		try!(stream.set_write_timeout(None));
+		try!(stream.shutdown(Shutdown::Read));
+		Ok(stream)
+	}
 }
 
 impl SyslogSender for InsecureThreadUnsafeBlockingTcpSyslogSender
 {
-	fn send(&self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>
+	fn send(&mut self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>
 	{
 		let timeNow = time::now_utc();
 		let data = self.syslog2Rfc.write(timeNow, rfc3164Facility, severity, structured_data_elements, message);
@@ -77,10 +83,9 @@ impl SyslogSender for InsecureThreadUnsafeBlockingTcpSyslogSender
 		let bytesLength: usize = data.len();
 		let mut bytesWrittenSoFar: usize = 0;
 		
-		let mut stream = &self.stream;
 		loop
 		{
-			let result = stream.write(&data[bytesWrittenSoFar..]);
+			let result = self.stream.write(&data[bytesWrittenSoFar..]);
 		
 			match result
 			{
@@ -91,17 +96,19 @@ impl SyslogSender for InsecureThreadUnsafeBlockingTcpSyslogSender
 					{
 						return Ok(())
 					}
-					debug_assert!(bytesWrittenSoFar <= bytesLength, "Syscalls to UDP sendto() are broken - they overwrote!");
+					debug_assert!(bytesWrittenSoFar <= bytesLength, "Syscalls to TCP write() are broken - they overwrote!");
 				},
 				Err(error) =>
 				{
 					match error.kind()
 					{
-						ErrorKind::WriteZero => continue,
-						ErrorKind::WouldBlock => continue,
-						ErrorKind::TimedOut => continue,
-						ErrorKind::Interrupted => continue,
-						//ErrorKind::ConnectionAborted => ? reconnect ?
+						ErrorKind::WriteZero | ErrorKind::WouldBlock | ErrorKind::TimedOut | ErrorKind::Interrupted => continue,
+						ErrorKind::ConnectionAborted | ErrorKind::ConnectionReset | ErrorKind::BrokenPipe =>
+						{
+							let peerAddress = try!(self.stream.peer_addr());
+							let replacementStream = try!(InsecureThreadUnsafeBlockingTcpSyslogSender::newTcpStream(peerAddress));
+							self.stream = replacementStream;
+						}
 						_ => return Err(error)
 					}
 				},

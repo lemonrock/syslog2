@@ -10,5 +10,5 @@ use rfc5424::StructuredData;
 
 pub trait SyslogSender
 {
-	fn send(&self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>;
+	fn send(&mut self, rfc3164Facility: Rfc3164Facility, severity: Severity, structured_data_elements: &StructuredData, message: &str) -> Result<()>;
 }
