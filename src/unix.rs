@@ -41,7 +41,7 @@ pub fn syslog_bytes(priority: Priority, message: &[u8])
 /// Note, to log to LOG_KERN, you must specify defaultFacility: LOG_KERN, otherwise calls to syslog2(LOG_KERN) will be converted by your underlying C library to syslog2(defaultFacility)
 /// This is because LOG_KERN is defined as 0 and the checks in nearly all system c libraries (eg musl) test for the presence of a bit pattern...
 /// An easy way to get the progname is to use the process crate's CurrentProcess static field
-pub fn with_open_syslog2<F, R>(programName: &CStr, logToStandardErrorAsWell: bool, defaultFacility: Facility, closure: F) -> R
+pub fn with_open_syslog<F, R>(programName: &CStr, logToStandardErrorAsWell: bool, defaultFacility: Facility, closure: F) -> R
 where F: Fn() -> R
 {
 	let logMask = default_log_mask();

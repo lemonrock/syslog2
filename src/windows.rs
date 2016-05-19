@@ -22,7 +22,7 @@ pub fn syslog_bytes(priority: Priority, message: &[u8])
 	log_to_standard_error_for_windows_and_solaris_bytes(priority, message);
 }
 
-pub fn with_open_syslog2<F, R>(programName: &CStr, logToStandardErrorAsWell: bool, defaultFacility: Facility, closure: F) -> R
+pub fn with_open_syslog<F, R>(programName: &CStr, logToStandardErrorAsWell: bool, defaultFacility: Facility, closure: F) -> R
 where F: Fn() -> R
 {
 	enable_logging_to_standard_error(programName, logToStandardErrorAsWell, defaultFacility);
